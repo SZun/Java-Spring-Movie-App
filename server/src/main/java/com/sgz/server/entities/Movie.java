@@ -19,6 +19,8 @@ public class Movie {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "genre_id")
     private Genre genre;
 
     @Column(name = "quantity", nullable = false)

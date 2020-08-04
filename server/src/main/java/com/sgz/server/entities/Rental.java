@@ -21,8 +21,12 @@ public class Rental {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
     private Movie movie;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
