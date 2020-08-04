@@ -6,6 +6,8 @@
 package com.sgz.server.exceptionhandlers;
 
 import com.sgz.server.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,10 +25,14 @@ import java.util.List;
 @RestControllerAdvice
 public class ExceptionHandlerController {
 
+    private final Logger logger = LoggerFactory.getLogger(ExceptionHandlerController.class);
+
     @ExceptionHandler(InvalidIdException.class)
     public final ResponseEntity<CustomError> handleInvalidIdException(
             InvalidIdException ex,
             WebRequest req) {
+
+        logHandler(ex, req);
 
         return new ResponseEntity<>(new CustomError(ex.getMessage(), "InvalidIdException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);
@@ -37,6 +43,8 @@ public class ExceptionHandlerController {
             NoItemsException ex,
             WebRequest req) {
 
+        logHandler(ex, req);
+
         return new ResponseEntity<>(new CustomError(ex.getMessage(), "NoItemsException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -45,6 +53,8 @@ public class ExceptionHandlerController {
     public final ResponseEntity<CustomError> handleInvalidEntityException(
             InvalidEntityException ex,
             WebRequest req) {
+
+        logHandler(ex, req);
 
         final String CUSTOM_ERR_MESSAGE = "Fields entered are invalid";
 
@@ -57,6 +67,8 @@ public class ExceptionHandlerController {
             InvalidNameException ex,
             WebRequest req) {
 
+        logHandler(ex, req);
+
         final String CUSTOM_ERR_MESSAGE = "Name entered is invalid";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidNameException"),
@@ -67,6 +79,8 @@ public class ExceptionHandlerController {
     public final ResponseEntity<CustomError> handleInvalidAuthorityException(
             InvalidAuthorityException ex,
             WebRequest req) {
+
+        logHandler(ex, req);
 
         final String CUSTOM_ERR_MESSAGE = "Authority entered is invalid";
 
@@ -79,6 +93,8 @@ public class ExceptionHandlerController {
             AccessDeniedException ex,
             WebRequest req) {
 
+        logHandler(ex, req);
+
         final String CUSTOM_ERR_MESSAGE = "Access to the requested resource was denied";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "AccessDenied"),
@@ -89,6 +105,8 @@ public class ExceptionHandlerController {
     public final ResponseEntity<CustomError> handleBindingErrors(
             MethodArgumentNotValidException ex,
             WebRequest req) {
+
+        logHandler(ex, req);
 
         List<FieldErrorResponse> errs = new ArrayList<>();
         ex.getBindingResult().getFieldErrors().forEach(fe -> {
@@ -104,6 +122,8 @@ public class ExceptionHandlerController {
             NumberFormatException ex,
             WebRequest req) {
 
+        logHandler(ex, req);
+
         final String CUSTOM_ERR_MESSAGE = "Number Format Exception";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "NumberFormatException"),
@@ -115,6 +135,8 @@ public class ExceptionHandlerController {
             IllegalArgumentException ex,
             WebRequest req) {
 
+        logHandler(ex, req);
+
         final String CUSTOM_ERR_MESSAGE = "Illegal argument";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "IllegalArgumentException"),
@@ -122,9 +144,23 @@ public class ExceptionHandlerController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomError> catchAll(Exception ex) {
-        CustomError err = new CustomError("Server Exception", "Exception");
-        return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<CustomError> catchAll(
+            Exception ex,
+            WebRequest req) {
+
+        logHandler(ex, req);
+
+        return new ResponseEntity<>(new CustomError("Server Exception", "Exception"), HttpStatus.BAD_REQUEST);
+    }
+
+    private final void logHandler(Exception toLog, WebRequest req){
+        logger.error(toLog.getMessage(), toLog);
+        logger.info(
+                req.getDescription(true),
+                req.getHeaderNames(),
+                req.getUserPrincipal()
+        );
+
     }
 
 }
