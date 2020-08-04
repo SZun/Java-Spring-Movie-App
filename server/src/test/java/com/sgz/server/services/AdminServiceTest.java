@@ -1,0 +1,94 @@
+package com.sgz.server.services;
+
+import com.google.common.collect.Sets;
+import com.sgz.server.entities.Role;
+import com.sgz.server.entities.User;
+import com.sgz.server.exceptions.InvalidEntityException;
+import com.sgz.server.repos.UserRepo;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class AdminServiceTest {
+
+    @InjectMocks
+    private AdminService toTest;
+
+    @Mock
+    private UserRepo userRepo;
+
+    private final UUID id = new UUID(36, 36);
+
+    private final Role testRole = new Role(id, "USER");
+
+    private final User expectedUser = new User(id, "@amBam20", "Sam", Sets.newHashSet(this.testRole));
+
+    private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
+
+    @Test
+    void updateUserRoles() throws InvalidEntityException {
+        when(userRepo.save(any(User.class))).thenReturn(expectedUser);
+
+        User fromService = toTest.updateUserRoles(expectedUser);
+
+        assertEquals(expectedUser, fromService);
+    }
+
+    @Test
+    void updateUserRolesNullUser() {
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(null));
+    }
+
+    @Test
+    void updateUserRolesBlankName() {
+        final User toEdit = new User(id, "@amBam20", "  ", Sets.newHashSet(this.testRole));
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+    @Test
+    void updateUserRolesEmptyName() {
+        final User toEdit = new User(id, "@amBam20", "", Sets.newHashSet(this.testRole));
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+    @Test
+    void updateUserRolesTooLongName() {
+        final User toEdit = new User(id, "@amBam20", testLongString, Sets.newHashSet(this.testRole));
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+    @Test
+    void updateUserRolesBlankPassword() {
+        final User toEdit = new User(id, "  ", "Sam", Sets.newHashSet(this.testRole));
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+    @Test
+    void updateUserRolesEmptyPassword() {
+        final User toEdit = new User(id, "", "Sam", Sets.newHashSet(this.testRole));
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+    @Test
+    void updateUserRolesNullRoles() {
+        final User toEdit = new User(id, "@amBam20", "Sam", null);
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+    @Test
+    void updateUserRolesEmpty() {
+        final User toEdit = new User(id, "@amBam20", "Sam", Sets.newHashSet());
+        assertThrows(InvalidEntityException.class, () -> toTest.updateUserRoles(toEdit));
+    }
+
+}
