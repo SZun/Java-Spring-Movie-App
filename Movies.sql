@@ -7,13 +7,13 @@ USE MovieDB;
 CREATE TABLE Customers(
 	Id BINARY(16) PRIMARY KEY,
 	`Name` VARCHAR(50) NOT NULL,
-    isGold BOOLEAN DEFAULT 0,
+    Gold BOOLEAN DEFAULT 0,
     Phone CHAR(10) NOT NULL
 );
 
 CREATE TABLE Genres(
 	Id BINARY(16) PRIMARY KEY,
-	`Name` VARCHAR(50) NOT NULL
+	`Name` VARCHAR(50) UNIQUE  NOT NULL
 );
 
 CREATE TABLE Movies(
@@ -30,7 +30,7 @@ CREATE TABLE Rentals(
     Movie_Id BINARY(16) NOT NULL,
     Customer_Id BINARY(16) NOT NULL,
     Rental_Date DATE NOT NULL,
-    Return_Date DATE NULL,
+    Return_Date DATE NOT NULL,
     Fee DECIMAL(5,2) NULL,
     FOREIGN KEY(Movie_Id) REFERENCES Movies(Id),
     FOREIGN KEY(Customer_Id) REFERENCES Customers(Id)
