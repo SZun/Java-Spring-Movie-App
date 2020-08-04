@@ -1,4 +1,4 @@
-USE BoilerplateDB;
+USE MovieDB;
 
 -- get all users
 SELECT * FROM Users;

@@ -1,4 +1,4 @@
-USE BoilerplateDB;	
+USE MovieDB;	
 
 SET @Zun_Id  = (UUID_TO_BIN('6ccd780c-baba-1026-9564-5b8c656024db', true));
 SET @Admin_Role_Id  = (UUID_TO_BIN('3eda4540-ffe3-4083-8cbd-78955baa81e6', true));
