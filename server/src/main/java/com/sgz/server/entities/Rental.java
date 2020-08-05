@@ -1,5 +1,8 @@
 package com.sgz.server.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -9,10 +12,14 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Entity
 @Table(name = "movies")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Rental {
 
     @Id
@@ -42,5 +49,17 @@ public class Rental {
     @Digits(integer = 3, fraction = 2, message="Must be properly formatted")
     @Column(nullable = false)
     private BigDecimal fee;
+
+    public void setFee(){
+        this.fee = this.getFee();
+    }
+
+    public BigDecimal getFee(){
+        long daysRented = ChronoUnit.DAYS.between(this.rentalDate, this.returnDate);
+
+        BigDecimal movieRate = this.movie.getDailyRate();
+
+        return movieRate.multiply(new BigDecimal(String.valueOf(daysRented)));
+    }
 
 }

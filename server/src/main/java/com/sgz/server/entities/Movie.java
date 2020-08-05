@@ -1,16 +1,20 @@
 package com.sgz.server.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
 @Table(name = "movies")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Movie {
 
     @Id
@@ -18,6 +22,11 @@ public class Movie {
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
+
+    @NotBlank(message = "Title must not be blank")
+    @Size(min = 5, max = 255, message = "Title must be between 5-255 characters")
+    @Column(nullable = false)
+    private String title;
 
     @ManyToOne
     @JoinColumn(name = "genre_id")

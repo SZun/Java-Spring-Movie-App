@@ -9,4 +9,6 @@ import java.util.UUID;
 @Repository
 public interface CustomerRepo extends JpaRepository<Customer, UUID> {
 
+    boolean existsByName(String name);
+
 }
