@@ -1,5 +1,8 @@
 package com.sgz.server.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,6 +12,9 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "genres")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Genre {
 
     @Id
