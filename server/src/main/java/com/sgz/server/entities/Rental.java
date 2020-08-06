@@ -50,14 +50,12 @@ public class Rental {
     @Column(nullable = false)
     private BigDecimal fee;
 
-    public void setFee(){
-        this.fee = this.getFee();
-    }
-
     public BigDecimal getFee(){
-        long daysRented = ChronoUnit.DAYS.between(this.rentalDate, this.returnDate);
+        if(fee != null) return fee;
 
-        BigDecimal movieRate = this.movie.getDailyRate();
+        long daysRented = ChronoUnit.DAYS.between(rentalDate, returnDate);
+
+        BigDecimal movieRate = movie.getDailyRate();
 
         return movieRate.multiply(new BigDecimal(String.valueOf(daysRented)));
     }
