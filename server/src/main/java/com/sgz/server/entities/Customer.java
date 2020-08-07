@@ -33,7 +33,7 @@ public class Customer {
     private boolean Gold;
 
     @NotBlank(message = "Phone number can not be blank")
-    @Pattern(regexp = "\"\\\\d{10}\"", message = "Phone number must be 10 digits")
+    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
     @Column(nullable = false)
     private String phone;
 

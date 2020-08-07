@@ -42,7 +42,6 @@ public class CustomerService {
     }
 
     public Customer getCustomerByName(String name) throws InvalidEntityException, InvalidNameException {
-
         if(name == null || name.trim().length() < 5
                 || name.trim().length() > 50){
             throw new InvalidEntityException("Invalid Name");
@@ -59,26 +58,29 @@ public class CustomerService {
         validateCustomer(toAdd);
         checkExistsByName(toAdd.getName());
 
+        toAdd.setGold(false);
+
         return customerRepo.save(toAdd);
     }
 
-    public Customer updateCustomerById(Customer toEdit, UUID userId) throws InvalidEntityException, InvalidIdException, AccessDeniedException {
+    public Customer updateCustomer(Customer toEdit, UUID authId) throws InvalidEntityException, InvalidIdException, AccessDeniedException {
         validateCustomer(toEdit);
-        checkAuthorization(toEdit.getId(), userId);
+        checkAuthorization(toEdit.getId(), authId);
         checkExistsById(toEdit.getId());
 
         return customerRepo.save(toEdit);
     }
 
-    public void deleteCustomerById(UUID writeId, UUID authId) throws AccessDeniedException {
+    public void deleteCustomerById(UUID writeId, UUID authId) throws AccessDeniedException, InvalidIdException {
         checkAuthorization(writeId, authId);
+        checkExistsById(writeId);
 
         customerRepo.deleteById(writeId);
     }
 
     private void validateCustomer(Customer toUpsert) throws InvalidEntityException {
         if(toUpsert == null || toUpsert.getPhone().trim().length() != 10
-                            || !toUpsert.getPhone().matches("\"\\\\d{10}\"")
+                            || !toUpsert.getPhone().matches("^\\d{10}$")
                             || toUpsert.getName().trim().length() < 5
                             || toUpsert.getName().trim().length() > 50) {
             throw new InvalidEntityException("Invalid Entity");
