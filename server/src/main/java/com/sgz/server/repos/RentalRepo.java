@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface RentalRepo extends JpaRepository<Rental, UUID> {
 
-    List<Rental> findAllByCustomer_Id(UUID id);
+    List<Rental> findAllByUser_Id(UUID id);
 
 }

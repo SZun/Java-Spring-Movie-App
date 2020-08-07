@@ -33,7 +33,6 @@ public class UserController {
     private AuthService authService;
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserVM> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
         toAdd.setRoles(Sets.newHashSet(roleService.getRoleByAuthority("USER")));
 

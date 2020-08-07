@@ -32,10 +32,10 @@ public class RentalService {
         return allRentals;
     }
 
-    public List<Rental> getAllRentalsByCustomerId(UUID customerId, UUID authId) throws NoItemsException, AccessDeniedException {
-        checkIsAuthorized(customerId, authId);
+    public List<Rental> getAllRentalsByCustomerId(UUID userId, UUID authId) throws NoItemsException, AccessDeniedException {
+        checkIsAuthorized(userId, authId);
 
-        List<Rental> allRentals = rentalRepo.findAllByCustomer_Id(customerId);
+        List<Rental> allRentals = rentalRepo.findAllByUser_Id(userId);
 
         if(allRentals.isEmpty()) throw new NoItemsException("No Items");
 
@@ -57,13 +57,13 @@ public class RentalService {
 
         Rental toReturn = toGet.get();
 
-        checkIsAuthorized(toReturn.getCustomer().getId(), authId);
+        checkIsAuthorized(toReturn.getUser().getId(), authId);
 
         return toReturn;
     }
 
     private void validateRental(Rental toAdd) throws InvalidEntityException {
-        if(toAdd == null || toAdd.getMovie() == null || toAdd.getCustomer() == null) {
+        if(toAdd == null || toAdd.getMovie() == null || toAdd.getUser() == null) {
             throw new InvalidEntityException("Invalid Entity");
         }
     }

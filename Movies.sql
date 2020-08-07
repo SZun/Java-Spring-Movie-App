@@ -4,13 +4,6 @@ CREATE DATABASE MovieDB;
 
 USE MovieDB;
 
-CREATE TABLE Customers(
-	Id BINARY(16) PRIMARY KEY,
-	`Name` VARCHAR(50) UNIQUE NOT NULL,
-    Gold BOOLEAN DEFAULT 0,
-    Phone CHAR(10) NOT NULL
-);
-
 CREATE TABLE Genres(
 	Id BINARY(16) PRIMARY KEY,
 	`Name` VARCHAR(50) UNIQUE  NOT NULL
@@ -25,21 +18,21 @@ CREATE TABLE Movies(
     FOREIGN KEY(Genre_Id) REFERENCES Genres(Id)
 );
 
-CREATE TABLE Rentals(
-	Id BINARY(16) PRIMARY KEY,
-    Movie_Id BINARY(16) NOT NULL,
-    Customer_Id BINARY(16) NOT NULL,
-    Rental_Date DATE NOT NULL,
-    Return_Date DATE NOT NULL,
-    Fee DECIMAL(5,2) NULL,
-    FOREIGN KEY(Movie_Id) REFERENCES Movies(Id),
-    FOREIGN KEY(Customer_Id) REFERENCES Customers(Id)
-);
-
 CREATE TABLE Users(
 	Id BINARY(16) PRIMARY KEY,
     Username VARCHAR(100) UNIQUE NOT NULL,
     `Password` VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Rentals(
+	Id BINARY(16) PRIMARY KEY,
+    Movie_Id BINARY(16) NOT NULL,
+    User_Id BINARY(16) NOT NULL,
+    Rental_Date DATE NOT NULL,
+    Return_Date DATE NOT NULL,
+    Fee DECIMAL(5,2) NULL,
+    FOREIGN KEY(Movie_Id) REFERENCES Movies(Id),
+    FOREIGN KEY(User_Id) REFERENCES Users(Id)
 );
 
 CREATE TABLE Roles(

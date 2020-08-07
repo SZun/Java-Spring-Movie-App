@@ -34,13 +34,13 @@ public class GenreController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Genre> createGenre(@Valid @RequestBody Genre toAdd) throws InvalidEntityException, InvalidNameException {
         return new ResponseEntity(genreService.createGenre(toAdd), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Genre> updateGenre(@PathVariable UUID id, @Valid @RequestBody Genre toEdit) throws InvalidIdException, InvalidEntityException {
         try {
             Genre toCheck = genreService.getGenreByName(toEdit.getName());
@@ -56,7 +56,7 @@ public class GenreController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_ADMIN')")
     public ResponseEntity<UUID> deleteGenreById(@PathVariable UUID id) throws InvalidIdException {
         genreService.deleteGenreById(id);
         return ResponseEntity.ok(id);
