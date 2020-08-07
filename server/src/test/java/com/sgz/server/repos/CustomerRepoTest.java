@@ -66,6 +66,39 @@ class CustomerRepoTest {
     }
 
     @Test
+    void findByName() {
+        given(toTest.findByName(anyString())).willReturn(Optional.of(expectedCustomer));
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        Optional<Customer> fromRepo = toTest.findByName("Sam");
+
+        verify(toTest).findByName(captor.capture());
+
+        String expectedParam = captor.getValue();
+
+        assertEquals("Sam", expectedParam);
+        assertTrue(fromRepo.isPresent());
+        assertEquals(expectedCustomer, fromRepo.get());
+    }
+
+    @Test
+    void findByNameEmpty() {
+        given(toTest.findByName(anyString())).willReturn(Optional.empty());
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        Optional<Customer> fromRepo = toTest.findByName("Sam");
+
+        verify(toTest).findByName(captor.capture());
+
+        String expectedParam = captor.getValue();
+
+        assertEquals("Sam", expectedParam);
+        assertTrue(fromRepo.isEmpty());
+    }
+
+    @Test
     void existsById() {
         given(toTest.existsById(any(UUID.class))).willReturn(true);
 
