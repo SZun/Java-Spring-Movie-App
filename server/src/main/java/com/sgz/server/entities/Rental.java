@@ -44,9 +44,6 @@ public class Rental {
     @Column(nullable = false)
     private LocalDate returnDate;
 
-    @DecimalMin(value = "00.00", message="Must be in proper range")
-    @DecimalMax(value = "999.99", message="Must be in proper range")
-    @Digits(integer = 3, fraction = 2, message="Must be properly formatted")
     @Column(nullable = false)
     private BigDecimal fee;
 
