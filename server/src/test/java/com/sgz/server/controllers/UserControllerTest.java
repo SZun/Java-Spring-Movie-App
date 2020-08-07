@@ -84,6 +84,7 @@ class UserControllerTest {
     private final User expectedUser = new User(this.id, "@amBam20", "Sam", Sets.newHashSet(testRole));
 
     @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void createUser() throws Exception {
         final String expected = "{\"id\":\"00000000-0000-0024-0000-000000000024\",\"username\":\"Sam\"}";
 
@@ -103,6 +104,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void createUserBindingResultError() throws Exception {
         final String expected = "{\"message\":\"Fields are invalid\",\"name\":\"InvalidRequestBodyException\"";
         User toCreate  = new User();
@@ -125,6 +127,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void createUserInvalidEntity() throws Exception {
         final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
         final String expectedName = "\"name\":\"InvalidEntityException\",";
@@ -148,6 +151,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void createUserInvalidName() throws Exception {
         final String expectedMsg = "\"message\":\"Name entered is invalid\",";
         final String expectedName = "\"name\":\"InvalidNameException\",";
@@ -171,6 +175,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void createUserInvalidAuthority() throws Exception {
         final String expectedMsg = "\"message\":\"Authority entered is invalid\",";
         final String expectedName = "\"name\":\"InvalidAuthorityException\",";
@@ -190,6 +195,17 @@ class UserControllerTest {
         assertTrue(content.contains(expectedMsg));
         assertTrue(content.contains(expectedName));
         assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    void createUserIsForbidden() throws Exception {
+        mockMvc.perform(
+                post(baseURL + "create")
+                        .content(objectMapper.writeValueAsString(testUser))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isForbidden());
+
     }
 
     @Test

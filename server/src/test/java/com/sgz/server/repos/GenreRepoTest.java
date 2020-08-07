@@ -64,6 +64,39 @@ class GenreRepoTest {
     }
 
     @Test
+    void findByName() {
+        given(toTest.findByName(anyString())).willReturn(Optional.of(expectedGenre));
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        Optional<Genre> fromRepo = toTest.findByName("Horror");
+
+        verify(toTest).findByName(captor.capture());
+
+        String expectedParam = captor.getValue();
+
+        assertEquals("Horror", expectedParam);
+        assertTrue(fromRepo.isPresent());
+        assertEquals(expectedGenre, fromRepo.get());
+    }
+
+    @Test
+    void findByNameEmpty() {
+        given(toTest.findByName(anyString())).willReturn(Optional.empty());
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        Optional<Genre> fromRepo = toTest.findByName("Horror");
+
+        verify(toTest).findByName(captor.capture());
+
+        String expectedParam = captor.getValue();
+
+        assertEquals("Horror", expectedParam);
+        assertTrue(fromRepo.isEmpty());
+    }
+
+    @Test
     void existsById() {
         given(toTest.existsById(any(UUID.class))).willReturn(true);
 
