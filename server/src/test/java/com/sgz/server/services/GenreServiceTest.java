@@ -183,4 +183,43 @@ class GenreServiceTest {
     void deleteGenreByIdInvalidId() {
         assertThrows(InvalidIdException.class, () -> toTest.getGenreById(UUID.randomUUID()));
     }
+
+    @Test
+    void getGenreByName() throws InvalidEntityException, InvalidNameException {
+        when(genreRepo.findByName(anyString())).thenReturn(Optional.of(expectedGenre));
+
+        Genre fromService = toTest.getGenreByName("Horror");
+
+        assertEquals(expectedGenre, fromService);
+    }
+
+    @Test
+    void getGenreByNameInvalidName() {
+        assertThrows(InvalidNameException.class, () -> toTest.getGenreByName("Horror"));
+    }
+
+    @Test
+    void getGenreByNameNullName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getGenreByName(null));
+    }
+
+    @Test
+    void getGenreByNameEmptyName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getGenreByName(""));
+    }
+
+    @Test
+    void getGenreByNameBlankName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getGenreByName("  "));
+    }
+
+    @Test
+    void getGenreByNameTooShortName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getGenreByName(testShortStr));
+    }
+
+    @Test
+    void getGenreByNameTooLongName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getGenreByName(testLongStr));
+    }
 }
