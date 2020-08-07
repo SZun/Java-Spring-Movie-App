@@ -20,7 +20,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -141,17 +140,17 @@ class RentalRepoTest {
     void findAllByGenre_Name() {
         final List<Rental> expectedRentals = Arrays.asList(expectedRental);
 
-        given(toTest.findAllByCustomer_Name(anyString())).willReturn(expectedRentals);
+        given(toTest.findAllByCustomer_Id(any(UUID.class))).willReturn(expectedRentals);
 
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        List<Rental> fromRepo = toTest.findAllByCustomer_Name("Sam");
+        List<Rental> fromRepo = toTest.findAllByCustomer_Id(id);
 
-        verify(toTest).findAllByCustomer_Name(captor.capture());
+        verify(toTest).findAllByCustomer_Id(captor.capture());
 
-        String expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(testCustomer.getName(), expectedParam);
+        assertEquals(id, expectedParam);
 
         assertEquals(expectedRentals, fromRepo);
     }
