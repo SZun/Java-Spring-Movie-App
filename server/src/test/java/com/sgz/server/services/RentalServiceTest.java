@@ -34,7 +34,7 @@ class RentalServiceTest {
 
     private final Genre testGenre = new Genre(this.id, "Horror");
 
-    private final Movie testMovie = new Movie(this.id, "Distarter Artist", this.testGenre, 100, new BigDecimal("1.00"));
+    private final Movie testMovie = new Movie(this.id, "Disaster Artist", this.testGenre, 100, new BigDecimal("1.00"));
 
     private final Set<Role> testRoles = Sets.newHashSet(Sets.newHashSet(new Role(this.id, "CUSTOMER")));
 
@@ -103,14 +103,14 @@ class RentalServiceTest {
 
     @Test
     void createRentalNullMovie() {
-        final Rental expectedRental = new Rental(id, null, testUser, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
-        assertThrows(InvalidEntityException.class, () -> toTest.createRental(null));
+        final Rental toCreate = new Rental(id, null, testUser, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
+        assertThrows(InvalidEntityException.class, () -> toTest.createRental(toCreate));
     }
 
     @Test
     void createRentalNullRentalCustomer() {
-        final Rental expectedRental = new Rental(id, testMovie, null, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
-        assertThrows(InvalidEntityException.class, () -> toTest.createRental(null));
+        final Rental toCreate = new Rental(id, testMovie, null, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
+        assertThrows(InvalidEntityException.class, () -> toTest.createRental(toCreate));
     }
 
     @Test
