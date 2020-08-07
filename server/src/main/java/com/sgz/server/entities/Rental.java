@@ -4,12 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -36,12 +32,8 @@ public class Rental {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(nullable = false)
     private LocalDate rentalDate;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(nullable = false)
     private LocalDate returnDate;
 
     @Column(nullable = false)
