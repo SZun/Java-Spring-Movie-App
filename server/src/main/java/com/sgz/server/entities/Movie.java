@@ -32,9 +32,12 @@ public class Movie {
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
+    @NotNull(message = "Quantity must not be null")
+    @Size(max = 99999, min = 0, message="Must be in proper range")
     @Column(name = "quantity", nullable = false)
     private long qty;
 
+    @NotNull(message = "Daily rate must not be null")
     @DecimalMin(value = "00.00", message="Must be in proper range")
     @DecimalMax(value = "99.99", message="Must be in proper range")
     @Digits(integer = 2, fraction = 2, message="Must be properly formatted")
