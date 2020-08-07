@@ -134,7 +134,7 @@ class RentalRepoTest {
     }
 
     @Test
-    void findAllByGenre_Name() {
+    void findAllByUser_Id() {
         final List<Rental> expectedRentals = Arrays.asList(expectedRental);
 
         given(toTest.findAllByUser_Id(any(UUID.class))).willReturn(expectedRentals);

@@ -32,7 +32,7 @@ public class RentalService {
         return allRentals;
     }
 
-    public List<Rental> getAllRentalsByCustomerId(UUID userId, UUID authId) throws NoItemsException, AccessDeniedException {
+    public List<Rental> getAllRentalsByUserId(UUID userId, UUID authId) throws NoItemsException, AccessDeniedException {
         checkIsAuthorized(userId, authId);
 
         List<Rental> allRentals = rentalRepo.findAllByUser_Id(userId);
