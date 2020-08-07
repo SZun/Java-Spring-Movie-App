@@ -48,8 +48,6 @@ public class Rental {
     private BigDecimal fee;
 
     public BigDecimal getFee(){
-        if(fee != null) return fee;
-
         long daysRented = ChronoUnit.DAYS.between(rentalDate, returnDate);
 
         BigDecimal movieRate = movie.getDailyRate();
