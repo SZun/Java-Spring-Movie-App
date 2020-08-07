@@ -258,6 +258,21 @@ class RoleControllerTest {
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void editRoleMismatchedIds() throws Exception {
+        when(roleService.editRole(any(Role.class))).thenReturn(expectedRole);
+        when(roleService.getRoleByAuthority(anyString())).thenReturn(expectedRole);
+
+        final Role toEdit = new Role(UUID.randomUUID(), "USER");
+
+        mockMvc.perform(
+                put(baseURL + "/" + id.toString())
+                        .content(objectMapper.writeValueAsString(toEdit))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void editRoleBindingResultException() throws Exception {
         final String expected = "{\"message\":\"Fields are invalid\",\"name\":\"InvalidRequestBodyException\"";
 
