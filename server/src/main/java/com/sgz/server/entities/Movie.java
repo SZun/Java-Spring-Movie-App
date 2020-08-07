@@ -33,7 +33,7 @@ public class Movie {
     private Genre genre;
 
     @NotNull(message = "Quantity must not be null")
-    @Digits(integer = 5, fraction = 0, message="Must be properly formatted")
+    @Size(max = 99999, min = 0, message="Must be in proper range")
     @Column(name = "quantity", nullable = false)
     private long qty;
 

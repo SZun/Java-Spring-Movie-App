@@ -77,7 +77,7 @@ public class MovieService {
                             || toUpsert.getTitle().trim().length() > 255
                             || toUpsert.getGenre() == null
                             || toUpsert.getQty() > 99999
-                            || toUpsert.getQty() > 1
+                            || toUpsert.getQty() < 0
                             || toUpsert.getDailyRate().compareTo(new BigDecimal("99.991")) == 1
                             || toUpsert.getDailyRate().compareTo(new BigDecimal("00.00")) == -1)
             throw new InvalidEntityException("Invalid Entity");
