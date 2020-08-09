@@ -1,12 +1,12 @@
 package com.sgz.server.entities;
 
+import com.sgz.server.models.MovieVM;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -23,8 +23,6 @@ public class Movie {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @NotBlank(message = "Title must not be blank")
-    @Size(min = 5, max = 255, message = "Title must be between 5-255 characters")
     @Column(nullable = false)
     private String title;
 
@@ -32,15 +30,17 @@ public class Movie {
     @JoinColumn(name = "genre_id")
     private Genre genre;
 
-    @NotNull(message = "Quantity must not be null")
-    @Size(max = 99999, min = 0, message="Must be in proper range")
     @Column(name = "quantity", nullable = false)
     private long qty;
 
-    @NotNull(message = "Daily rate must not be null")
-    @DecimalMin(value = "00.00", message="Must be in proper range")
-    @DecimalMax(value = "99.99", message="Must be in proper range")
-    @Digits(integer = 2, fraction = 2, message="Must be properly formatted")
     @Column(nullable = false)
     private BigDecimal dailyRate;
+
+    public Movie(MovieVM that, Genre genre) {
+        this.id = that.getId();
+        this.title = that.getTitle();
+        this.genre = genre;
+        this.qty = that.getQty();
+        this.dailyRate = that.getDailyRate();
+    }
 }

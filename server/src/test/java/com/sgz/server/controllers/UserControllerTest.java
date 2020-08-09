@@ -198,17 +198,6 @@ class UserControllerTest {
     }
 
     @Test
-    void createUserIsForbidden() throws Exception {
-        mockMvc.perform(
-                post(baseURL + "create")
-                        .content(objectMapper.writeValueAsString(testUser))
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-                .andExpect(status().isForbidden());
-
-    }
-
-    @Test
     @WithMockUser
     void getAllUsers() throws Exception {
         final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"username\":\"Sam\"}]";

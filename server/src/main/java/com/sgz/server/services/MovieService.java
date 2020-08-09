@@ -32,13 +32,8 @@ public class MovieService {
         return allMovies;
     }
 
-    public List<Movie> getAllByGenreName(String name) throws InvalidEntityException, NoItemsException {
-        if(name == null || name.trim().length() < 5
-                || name.trim().length() > 50){
-            throw new InvalidEntityException("Invalid Name");
-        }
-
-        List<Movie> allMovies = movieRepo.findAllByGenre_Name(name);
+    public List<Movie> getAllMoviesByGenreId(UUID id) throws NoItemsException {
+        List<Movie> allMovies = movieRepo.findAllByGenre_Id(id);
 
         if(allMovies.isEmpty()) throw new NoItemsException("No Items");
 

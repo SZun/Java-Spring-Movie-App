@@ -63,13 +63,13 @@ class MovieServiceTest {
     }
 
     @Test
-    void getAllByGenreName() throws InvalidEntityException, NoItemsException {
+    void getAllMoviesByGenreId() throws NoItemsException {
         final Movie expectedMovie2 = new Movie(this.id, "Wolfman", this.testGenre, 00100, new BigDecimal("09.99"));
         final Movie expectedMovie3 = new Movie(this.id, "The Avengers", this.testGenre, 00100, new BigDecimal("09.99"));
 
-        when(movieRepo.findAllByGenre_Name(anyString())).thenReturn(Arrays.asList(expectedMovie, expectedMovie2, expectedMovie3));
+        when(movieRepo.findAllByGenre_Id(any(UUID.class))).thenReturn(Arrays.asList(expectedMovie, expectedMovie2, expectedMovie3));
 
-        List<Movie> fromService = toTest.getAllByGenreName(testGenre.getName());
+        List<Movie> fromService = toTest.getAllMoviesByGenreId(id);
 
         assertEquals(3, fromService.size());
         assertTrue(fromService.contains(expectedMovie));
@@ -78,33 +78,8 @@ class MovieServiceTest {
     }
 
     @Test
-    void getAllByGenreNameNullName(){
-        assertThrows(InvalidEntityException.class, () -> toTest.getAllByGenreName(null));
-    }
-
-    @Test
-    void getAllByGenreNameBlankName(){
-        assertThrows(InvalidEntityException.class, () -> toTest.getAllByGenreName("  "));
-    }
-
-    @Test
-    void getAllByGenreNameEmptyName(){
-        assertThrows(InvalidEntityException.class, () -> toTest.getAllByGenreName(""));
-    }
-
-    @Test
-    void getAllByGenreNameTooLongName(){
-        assertThrows(InvalidEntityException.class, () -> toTest.getAllByGenreName(testLongStr));
-    }
-
-    @Test
-    void getAllByGenreNameTooShortName(){
-        assertThrows(InvalidEntityException.class, () -> toTest.getAllByGenreName(testShortStr));
-    }
-
-    @Test
-    void getAllByGenreNameNoItems(){
-        assertThrows(NoItemsException.class,  () -> toTest.getAllByGenreName(testGenre.getName()));
+    void getAllMoviesByGenreIdNoItems(){
+        assertThrows(NoItemsException.class,  () -> toTest.getAllMoviesByGenreId(id));
     }
 
     @Test
