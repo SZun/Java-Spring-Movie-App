@@ -22,7 +22,7 @@ public class MovieVM {
     private UUID genreId;
 
     @NotNull(message = "Quantity must not be null")
-    @Size(max = 99999, message="Must be in proper range")
+    @Max(value = 99999, message="Must be in proper range")
     private long qty;
 
     @NotNull(message = "Daily rate must not be null")

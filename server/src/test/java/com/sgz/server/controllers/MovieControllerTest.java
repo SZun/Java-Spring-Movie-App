@@ -6,6 +6,7 @@ import com.sgz.server.entities.Movie;
 import com.sgz.server.exceptions.InvalidIdException;
 import com.sgz.server.jwt.JwtConfig;
 import com.sgz.server.jwt.JwtSecretKey;
+import com.sgz.server.models.MovieVM;
 import com.sgz.server.services.GenreService;
 import com.sgz.server.services.MovieService;
 import com.sgz.server.services.UserDetailsServiceImpl;
@@ -75,10 +76,14 @@ class MovieControllerTest {
 
     private final Movie testMovie = new Movie(this.id, "Disaster Artist", this.testGenre, 00100, new BigDecimal("09.99"));
 
+    private final MovieVM testMovieVM = new MovieVM(this.id, "Disaster Artist", this.testGenre.getId(), 0100, new BigDecimal("09.99"));
+
+    private final String expectedMovie = "{\"id\":\"00000000-0000-0024-0000-000000000024\",\"title\":\"Disaster Artist\",\"genre\":{\"id\":\"00000000-0000-0024-0000-000000000024\",\"name\":\"Horror\"},\"qty\":64,\"dailyRate\":9.99}";
+
     @Test
     @WithMockUser
     void getAllMovies() throws Exception {
-        final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"title\":\"Disaster Artist\",\"genre\":{\"id\":\"00000000-0000-0024-0000-000000000024\",\"name\":\"Horror\"},\"qty\":64,\"dailyRate\":9.99}]";
+        final String expected = "[" + expectedMovie + "]";
 
         when(movieService.getAllMovies()).thenReturn(Arrays.asList(testMovie));
 
@@ -105,7 +110,7 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getAllMoviesByGenreName() throws Exception {
-        final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"title\":\"Disaster Artist\",\"genre\":{\"id\":\"00000000-0000-0024-0000-000000000024\",\"name\":\"Horror\"},\"qty\":64,\"dailyRate\":9.99}]";
+        final String expected = "[" + expectedMovie + "]";
 
         when(movieService.getAllMoviesByGenreId(any(UUID.class))).thenReturn(Arrays.asList(testMovie));
 
@@ -132,6 +137,13 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getMovieById() throws Exception {
+        when(movieService.getMovieById(any(UUID.class))).thenReturn(testMovie);
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURLWithId))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(expectedMovie, content);
     }
 
     @Test
@@ -150,6 +162,18 @@ class MovieControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void createMovie() throws Exception {
+        when(genreService.getGenreById(any(UUID.class))).thenReturn(testGenre);
+        when(movieService.createMovie(any(Movie.class))).thenReturn(testMovie);
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURL)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isCreated()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(expectedMovie, content);
     }
 
     @Test
@@ -175,6 +199,18 @@ class MovieControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void updateMovie() throws Exception {
+        when(genreService.getGenreById(any(UUID.class))).thenReturn(testGenre);
+        when(movieService.updateMovie(any(Movie.class))).thenReturn(testMovie);
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURLWithId)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(expectedMovie, content);
     }
 
     @Test
