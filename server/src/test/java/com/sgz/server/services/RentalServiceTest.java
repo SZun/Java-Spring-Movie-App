@@ -63,13 +63,13 @@ class RentalServiceTest {
     }
 
     @Test
-    void getAllRentalsByUserId() throws NoItemsException, AccessDeniedException {
+    void getAllRentalsByUserId() throws NoItemsException {
         final Rental expectedRental2 = new Rental(id, testMovie, testUser, LocalDate.of(2020, 8, 10), LocalDate.of(2020, 8, 17), null);
         final Rental expectedRental3 = new Rental(id, testMovie, testUser, LocalDate.of(2020, 8, 20), LocalDate.of(2020, 8, 27), null);
 
         when(rentalRepo.findAllByUser_Id(any(UUID.class))).thenReturn(Arrays.asList(expectedRental, expectedRental2, expectedRental3));
 
-        List<Rental> fromService = toTest.getAllRentalsByUserId(id, id);
+        List<Rental> fromService = toTest.getAllRentalsByUserId(id);
 
         assertEquals(3, fromService.size());
         assertTrue(fromService.contains(expectedRental));
@@ -79,12 +79,7 @@ class RentalServiceTest {
 
     @Test
     void getAllRentalsByCustomerIdNoItems() {
-        assertThrows(NoItemsException.class, () -> toTest.getAllRentalsByUserId(id, id));
-    }
-
-    @Test
-    void getAllRentalsByCustomerIdAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> toTest.getAllRentalsByUserId(id, UUID.randomUUID()));
+        assertThrows(NoItemsException.class, () -> toTest.getAllRentalsByUserId(id));
     }
 
     @Test
