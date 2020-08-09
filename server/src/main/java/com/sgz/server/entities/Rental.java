@@ -32,8 +32,10 @@ public class Rental {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
     private LocalDate rentalDate;
 
+    @Column(nullable = false)
     private LocalDate returnDate;
 
     @Column(nullable = false)
