@@ -33,6 +33,11 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getAllMovies());
     }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<List<Movie>> getAllMoviesByGenreId(String genreName) throws NoItemsException, InvalidEntityException {
+        return ResponseEntity.ok(movieService.getAllByGenreName(genreName));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable UUID id) throws InvalidIdException {
         return ResponseEntity.ok(movieService.getMovieById(id));
