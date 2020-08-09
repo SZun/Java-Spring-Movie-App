@@ -46,7 +46,7 @@ public class RoleController {
     public ResponseEntity<Role> editRole(@PathVariable UUID id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
         try {
             Role toCheck = roleService.getRoleByAuthority(toEdit.getAuthority());
-            if (!toCheck.getId().equals(id)) {
+            if (!toCheck.getId().equals(id) || !toEdit.getId().equals(id)) {
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
         } catch (InvalidAuthorityException | InvalidEntityException ex) {

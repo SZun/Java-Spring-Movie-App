@@ -27,7 +27,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userService;
     private final SecretKey secretKey;
     private final JwtConfig config;
-//    private final String baseURL = "/api/v1/";
+    private final String baseURL = "/api/v1/";
 
     @Autowired
     public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, UserDetailsServiceImpl userService, SecretKey secretKey, JwtConfig config) {
@@ -46,7 +46,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), config, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(secretKey, config), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", "/index", "/css/*", "/js/*").permitAll()
+                .antMatchers("/", baseURL + "users/create", "/index", "/css/*", "/js/*").permitAll()
                 .anyRequest()
                 .authenticated();
 

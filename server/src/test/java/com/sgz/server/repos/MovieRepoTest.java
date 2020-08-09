@@ -31,7 +31,7 @@ class MovieRepoTest {
 
     private final Genre testGenre = new Genre(this.id, "Horror");
 
-    private final Movie expectedMovie = new Movie(this.id, "Distarter Artist", this.testGenre, 100, new BigDecimal("1.00"));
+    private final Movie expectedMovie = new Movie(this.id, "Disaster Artist", this.testGenre, 100, new BigDecimal("1.00"));
 
     @Test
     void save() {
@@ -45,7 +45,7 @@ class MovieRepoTest {
 
         Movie expectedParam = captor.getValue();
         assertEquals(id, expectedParam.getId());
-        assertEquals("Distarter Artist", expectedParam.getTitle());
+        assertEquals("Disaster Artist", expectedParam.getTitle());
         assertEquals(testGenre, expectedParam.getGenre());
         assertEquals(100, expectedParam.getQty());
         assertEquals(new BigDecimal("1.00"), expectedParam.getDailyRate());

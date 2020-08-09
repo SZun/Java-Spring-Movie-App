@@ -1,9 +1,7 @@
 package com.sgz.server.services;
 
-import com.sgz.server.entities.Customer;
-import com.sgz.server.entities.Genre;
-import com.sgz.server.entities.Movie;
-import com.sgz.server.entities.Rental;
+import com.google.common.collect.Sets;
+import com.sgz.server.entities.*;
 import com.sgz.server.exceptions.InvalidEntityException;
 import com.sgz.server.exceptions.InvalidIdException;
 import com.sgz.server.exceptions.NoItemsException;
@@ -17,10 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,16 +34,18 @@ class RentalServiceTest {
 
     private final Genre testGenre = new Genre(this.id, "Horror");
 
-    private final Movie testMovie = new Movie(this.id, "Distarter Artist", this.testGenre, 100, new BigDecimal("1.00"));
+    private final Movie testMovie = new Movie(this.id, "Disaster Artist", this.testGenre, 100, new BigDecimal("1.00"));
 
-    private final Customer testCustomer = new Customer(this.id, "Sam", true, "1234567890");
+    private final Set<Role> testRoles = Sets.newHashSet(Sets.newHashSet(new Role(this.id, "CUSTOMER")));
 
-    private final Rental expectedRental = new Rental(this.id, this.testMovie, this.testCustomer, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
+    private final User testUser = new User(this.id, "@amBam20", "Sam", this.testRoles);
+
+    private final Rental expectedRental = new Rental(this.id, this.testMovie, this.testUser, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
 
     @Test
     void getAllRentals() throws NoItemsException {
-        final Rental expectedRental2 = new Rental(this.id, this.testMovie, this.testCustomer, LocalDate.of(2020, 8, 10), LocalDate.of(2020, 8, 17), null);
-        final Rental expectedRental3 = new Rental(this.id, this.testMovie, this.testCustomer, LocalDate.of(2020, 8, 20), LocalDate.of(2020, 8, 27), null);
+        final Rental expectedRental2 = new Rental(this.id, this.testMovie, testUser, LocalDate.of(2020, 8, 10), LocalDate.of(2020, 8, 17), null);
+        final Rental expectedRental3 = new Rental(this.id, this.testMovie, testUser, LocalDate.of(2020, 8, 20), LocalDate.of(2020, 8, 27), null);
 
         when(rentalRepo.findAll()).thenReturn(Arrays.asList(expectedRental, expectedRental2, expectedRental3));
 
@@ -66,13 +63,13 @@ class RentalServiceTest {
     }
 
     @Test
-    void getAllRentalsByCustomerId() throws NoItemsException, AccessDeniedException {
-        final Rental expectedRental2 = new Rental(this.id, this.testMovie, this.testCustomer, LocalDate.of(2020, 8, 10), LocalDate.of(2020, 8, 17), null);
-        final Rental expectedRental3 = new Rental(this.id, this.testMovie, this.testCustomer, LocalDate.of(2020, 8, 20), LocalDate.of(2020, 8, 27), null);
+    void getAllRentalsByUserId() throws NoItemsException, AccessDeniedException {
+        final Rental expectedRental2 = new Rental(id, testMovie, testUser, LocalDate.of(2020, 8, 10), LocalDate.of(2020, 8, 17), null);
+        final Rental expectedRental3 = new Rental(id, testMovie, testUser, LocalDate.of(2020, 8, 20), LocalDate.of(2020, 8, 27), null);
 
-        when(rentalRepo.findAllByCustomer_Id(any(UUID.class))).thenReturn(Arrays.asList(expectedRental, expectedRental2, expectedRental3));
+        when(rentalRepo.findAllByUser_Id(any(UUID.class))).thenReturn(Arrays.asList(expectedRental, expectedRental2, expectedRental3));
 
-        List<Rental> fromService = toTest.getAllRentalsByCustomerId(id, id);
+        List<Rental> fromService = toTest.getAllRentalsByUserId(id, id);
 
         assertEquals(3, fromService.size());
         assertTrue(fromService.contains(expectedRental));
@@ -82,12 +79,12 @@ class RentalServiceTest {
 
     @Test
     void getAllRentalsByCustomerIdNoItems() {
-        assertThrows(NoItemsException.class, () -> toTest.getAllRentalsByCustomerId(id, id));
+        assertThrows(NoItemsException.class, () -> toTest.getAllRentalsByUserId(id, id));
     }
 
     @Test
     void getAllRentalsByCustomerIdAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> toTest.getAllRentalsByCustomerId(id, UUID.randomUUID()));
+        assertThrows(AccessDeniedException.class, () -> toTest.getAllRentalsByUserId(id, UUID.randomUUID()));
     }
 
     @Test
@@ -106,14 +103,14 @@ class RentalServiceTest {
 
     @Test
     void createRentalNullMovie() {
-        final Rental expectedRental = new Rental(id, null, this.testCustomer, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
-        assertThrows(InvalidEntityException.class, () -> toTest.createRental(null));
+        final Rental toCreate = new Rental(id, null, testUser, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
+        assertThrows(InvalidEntityException.class, () -> toTest.createRental(toCreate));
     }
 
     @Test
     void createRentalNullRentalCustomer() {
-        final Rental expectedRental = new Rental(id, testMovie, null, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
-        assertThrows(InvalidEntityException.class, () -> toTest.createRental(null));
+        final Rental toCreate = new Rental(id, testMovie, null, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
+        assertThrows(InvalidEntityException.class, () -> toTest.createRental(toCreate));
     }
 
     @Test

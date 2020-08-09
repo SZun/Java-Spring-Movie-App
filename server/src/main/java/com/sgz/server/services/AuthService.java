@@ -1,6 +1,5 @@
 package com.sgz.server.services;
 
-import com.sgz.server.repos.CustomerRepo;
 import com.sgz.server.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,22 +11,15 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserRepo userRepo;
-    private final CustomerRepo customerRepo;
 
     @Autowired
-    public AuthService(UserRepo userRepo, CustomerRepo customerRepo) {
+    public AuthService(UserRepo userRepo) {
         this.userRepo = userRepo;
-        this.customerRepo = customerRepo;
     }
 
     public UUID getUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepo.findByUsername(username).get().getId();
-    }
-
-    public UUID getCustomerId() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        return customerRepo.findByName(name).get().getId();
     }
 
 }

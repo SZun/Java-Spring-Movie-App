@@ -1,9 +1,7 @@
 package com.sgz.server.repos;
 
-import com.sgz.server.entities.Customer;
-import com.sgz.server.entities.Genre;
-import com.sgz.server.entities.Movie;
-import com.sgz.server.entities.Rental;
+import com.google.common.collect.Sets;
+import com.sgz.server.entities.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -12,10 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,11 +28,13 @@ class RentalRepoTest {
 
     private final Genre testGenre = new Genre(this.id, "Horror");
 
-    private final Movie testMovie = new Movie(this.id, "Distarter Artist", this.testGenre, 100, new BigDecimal("1.00"));
+    private final Movie testMovie = new Movie(this.id, "Disaster Artist", this.testGenre, 100, new BigDecimal("1.00"));
 
-    private final Customer testCustomer = new Customer(this.id, "Sam", true, "1234567890");
+    private final Set<Role> testRoles = Sets.newHashSet(Sets.newHashSet(new Role(this.id, "CUSTOMER")));
 
-    private final Rental expectedRental = new Rental(this.id, this.testMovie, this.testCustomer, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
+    private final User testUser = new User(this.id, "@amBam20", "Sam", this.testRoles);
+
+    private final Rental expectedRental = new Rental(this.id, this.testMovie, this.testUser, LocalDate.of(2020, 8, 04), LocalDate.of(2020, 8, 11), null);
 
     @Test
     void save() {
@@ -53,7 +50,7 @@ class RentalRepoTest {
         assertEquals(id, expectedParam.getId());
         assertEquals(testMovie, expectedParam.getMovie());
         assertEquals(testGenre, expectedParam.getMovie().getGenre());
-        assertEquals(testCustomer, expectedParam.getCustomer());
+        assertEquals(testUser, expectedParam.getUser());
         assertEquals(LocalDate.of(2020, 8, 04), expectedParam.getRentalDate());
         assertEquals(LocalDate.of(2020, 8, 11), expectedParam.getReturnDate());
         assertEquals(new BigDecimal("7.00"), expectedParam.getFee());
@@ -137,16 +134,16 @@ class RentalRepoTest {
     }
 
     @Test
-    void findAllByGenre_Name() {
+    void findAllByUser_Id() {
         final List<Rental> expectedRentals = Arrays.asList(expectedRental);
 
-        given(toTest.findAllByCustomer_Id(any(UUID.class))).willReturn(expectedRentals);
+        given(toTest.findAllByUser_Id(any(UUID.class))).willReturn(expectedRentals);
 
         ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        List<Rental> fromRepo = toTest.findAllByCustomer_Id(id);
+        List<Rental> fromRepo = toTest.findAllByUser_Id(id);
 
-        verify(toTest).findAllByCustomer_Id(captor.capture());
+        verify(toTest).findAllByUser_Id(captor.capture());
 
         UUID expectedParam = captor.getValue();
 
