@@ -3,7 +3,9 @@ package com.sgz.server.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sgz.server.entities.Genre;
 import com.sgz.server.entities.Movie;
+import com.sgz.server.exceptions.InvalidEntityException;
 import com.sgz.server.exceptions.InvalidIdException;
+import com.sgz.server.exceptions.NoItemsException;
 import com.sgz.server.jwt.JwtConfig;
 import com.sgz.server.jwt.JwtSecretKey;
 import com.sgz.server.models.MovieVM;
@@ -97,6 +99,19 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getAllMoviesNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(movieService.getAllMovies()).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -124,6 +139,19 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getAllMoviesByGenreNameNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(movieService.getAllMoviesByGenreId(any(UUID.class))).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/genres/" + testUUIDStr))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -149,6 +177,19 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getMovieByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(movieService.getMovieById(any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURLWithId))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -179,11 +220,46 @@ class MovieControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void createMovieInvalidGenre() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(genreService.getGenreById(any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURL)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void createMovieInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(genreService.getGenreById(any(UUID.class))).thenReturn(testGenre);
+        when(movieService.createMovie(any(Movie.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURL)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -216,11 +292,68 @@ class MovieControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void updateMovieInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(genreService.getGenreById(any(UUID.class))).thenReturn(testGenre);
+        when(movieService.updateMovie(any(Movie.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURLWithId)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void updateMovieInvalidGenre() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(genreService.getGenreById(any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURLWithId)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser(roles = {"EMPLOYEE"})
+    void updateMovieInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(movieService.updateMovie(any(Movie.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURLWithId)
+                        .content(objectMapper.writeValueAsString(testMovieVM))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
