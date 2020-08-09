@@ -17,7 +17,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -132,17 +131,17 @@ class MovieRepoTest {
     void findAllByGenre_Name() {
         final List<Movie> expectedMovies = Arrays.asList(expectedMovie);
 
-        given(toTest.findAllByGenre_Name(anyString())).willReturn(expectedMovies);
+        given(toTest.findAllByGenre_Id(any(UUID.class))).willReturn(expectedMovies);
 
-        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        List<Movie> fromRepo = toTest.findAllByGenre_Name("Horror");
+        List<Movie> fromRepo = toTest.findAllByGenre_Id(id);
 
-        verify(toTest).findAllByGenre_Name(captor.capture());
+        verify(toTest).findAllByGenre_Id(captor.capture());
 
-        String expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(testGenre.getName(), expectedParam);
+        assertEquals(id, expectedParam);
 
         assertEquals(expectedMovies, fromRepo);
     }

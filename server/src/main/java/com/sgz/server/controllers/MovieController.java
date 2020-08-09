@@ -33,9 +33,9 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getAllMovies());
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<List<Movie>> getAllMoviesByGenreId(String genreName) throws NoItemsException, InvalidEntityException {
-        return ResponseEntity.ok(movieService.getAllByGenreName(genreName));
+    @GetMapping("/genres/{id}")
+    public ResponseEntity<List<Movie>> getAllMoviesByGenreId(@PathVariable UUID id) throws NoItemsException {
+        return ResponseEntity.ok(movieService.getAllMoviesByGenreId(id));
     }
 
     @GetMapping("/{id}")
@@ -63,7 +63,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.updateMovie(toEdit));
     }
 
-    @DeleteMapping("/{id")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_ADMIN')")
     public ResponseEntity<UUID> deleteMovieById(@PathVariable UUID id) throws InvalidIdException {
         movieService.deleteMovieById(id);

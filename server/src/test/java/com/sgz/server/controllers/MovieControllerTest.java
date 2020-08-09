@@ -3,6 +3,7 @@ package com.sgz.server.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sgz.server.entities.Genre;
 import com.sgz.server.entities.Movie;
+import com.sgz.server.exceptions.InvalidIdException;
 import com.sgz.server.jwt.JwtConfig;
 import com.sgz.server.jwt.JwtSecretKey;
 import com.sgz.server.services.GenreService;
@@ -18,11 +19,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -71,6 +78,15 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getAllMovies() throws Exception {
+        final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"title\":\"Disaster Artist\",\"genre\":{\"id\":\"00000000-0000-0024-0000-000000000024\",\"name\":\"Horror\"},\"qty\":64,\"dailyRate\":9.99}]";
+
+        when(movieService.getAllMovies()).thenReturn(Arrays.asList(testMovie));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(expected, content);
     }
 
     @Test
@@ -89,11 +105,15 @@ class MovieControllerTest {
     @Test
     @WithMockUser
     void getAllMoviesByGenreName() throws Exception {
-    }
+        final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"title\":\"Disaster Artist\",\"genre\":{\"id\":\"00000000-0000-0024-0000-000000000024\",\"name\":\"Horror\"},\"qty\":64,\"dailyRate\":9.99}]";
 
-    @Test
-    @WithMockUser
-    void getAllMoviesByGenreNameInvalidEntity() throws Exception {
+        when(movieService.getAllMoviesByGenreId(any(UUID.class))).thenReturn(Arrays.asList(testMovie));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/genres/" + testUUIDStr))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals(expected, content);
     }
 
     @Test
@@ -104,7 +124,7 @@ class MovieControllerTest {
     @Test
     void getAllMoviesByGenreNameForbidden() throws Exception {
         mockMvc.perform(
-                get(baseURL + "/" + "Horror")
+                get(baseURL + "/Horror")
         )
                 .andExpect(status().isForbidden());
     }
@@ -180,11 +200,29 @@ class MovieControllerTest {
     @Test
     @WithMockUser(roles = {"ADMIN"})
     void deleteMovieById() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(delete(baseURLWithId))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals("\"" + testUUIDStr + "\"", content);
     }
 
     @Test
     @WithMockUser(roles = {"ADMIN"})
     void deleteMovieByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(delete(baseURLWithId))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(delete(baseURLWithId))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
