@@ -3,6 +3,9 @@ package com.sgz.server.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.sgz.server.entities.*;
+import com.sgz.server.exceptions.InvalidEntityException;
+import com.sgz.server.exceptions.InvalidIdException;
+import com.sgz.server.exceptions.NoItemsException;
 import com.sgz.server.jwt.JwtConfig;
 import com.sgz.server.jwt.JwtSecretKey;
 import com.sgz.server.services.*;
@@ -20,12 +23,14 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -105,6 +110,19 @@ class RentalControllerTest {
     @Test
     @WithMockUser
     void getAllRentalsNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(rentalService.getAllRentals()).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -120,7 +138,6 @@ class RentalControllerTest {
     void getAllRentalsByUserIdEmployee() throws Exception {
         final String expected = "[" + expectedRental + "]";
 
-        when(authService.getUserId()).thenReturn(id);
         when(rentalService.getAllRentalsByUserId(any(UUID.class))).thenReturn(Arrays.asList(testRental));
 
         MvcResult mvcResult = mockMvc.perform(get(baseURL + "/users/" + testUUIDStr))
@@ -133,6 +150,19 @@ class RentalControllerTest {
     @Test
     @WithMockUser(roles = {"EMPLOYEE"})
     void getAllRentalsByUserIdEmployeeNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(rentalService.getAllRentalsByUserId(any(UUID.class))).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/users/" + testUUIDStr))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -161,6 +191,20 @@ class RentalControllerTest {
     @Test
     @WithMockUser
     void getAllRentalsByUserIdNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(rentalService.getAllRentalsByUserId(any(UUID.class))).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/mine"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -187,11 +231,39 @@ class RentalControllerTest {
     @Test
     @WithMockUser
     void getRentalByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(rentalService.getRentalById(any(UUID.class), any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURLWithId))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     @WithMockUser
     void getRentalByIdAccessDenied() throws Exception {
+        final String expectedMsg = "\"message\":\"Access to the requested resource was denied\",";
+        final String expectedName = "\"name\":\"AccessDenied\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(rentalService.getRentalById(any(UUID.class), any(UUID.class))).thenThrow(new AccessDeniedException("Access Denied"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURLWithId))
+                .andExpect(status().isForbidden()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -224,11 +296,48 @@ class RentalControllerTest {
     @Test
     @WithMockUser
     void createRentalInvalidIdException() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(movieService.getMovieById(any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURLWithId)
+                        .content(objectMapper.writeValueAsString(id))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     @WithMockUser
-    void createRentalInvalidIdEntity() throws Exception {
+    void createRentalInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(movieService.getMovieById(any(UUID.class))).thenReturn(testMovie);
+        when(userService.getUserById(any(UUID.class))).thenReturn(testUser);
+        when(authService.getUserId()).thenReturn(id);
+        when(rentalService.createRental(any(Rental.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURLWithId)
+                        .content(objectMapper.writeValueAsString(id))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
