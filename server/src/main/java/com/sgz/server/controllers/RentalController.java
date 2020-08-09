@@ -41,14 +41,14 @@ public class RentalController {
 
     @GetMapping("/users/{id}")
     @PreAuthorize("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_ADMIN')")
-    public ResponseEntity<List<Rental>> getAllRentalsByUserIdEmployee(@PathVariable UUID id) throws NoItemsException, AccessDeniedException {
-        return ResponseEntity.ok(rentalService.getAllRentalsByUserId(id, id));
+    public ResponseEntity<List<Rental>> getAllRentalsByUserIdEmployee(@PathVariable UUID id) throws NoItemsException {
+        return ResponseEntity.ok(rentalService.getAllRentalsByUserId(id));
     }
 
-    @GetMapping("/my/{id}")
-    public ResponseEntity<List<Rental>> getAllRentalsByUserId(@PathVariable UUID id) throws NoItemsException, AccessDeniedException {
+    @GetMapping("/mine")
+    public ResponseEntity<List<Rental>> getAllRentalsByUserId() throws NoItemsException {
         UUID userId = authService.getUserId();
-        return ResponseEntity.ok(rentalService.getAllRentalsByUserId(id, userId));
+        return ResponseEntity.ok(rentalService.getAllRentalsByUserId(authService.getUserId()));
     }
 
     @GetMapping("/{id}")
@@ -56,8 +56,8 @@ public class RentalController {
         return ResponseEntity.ok(rentalService.getRentalById(id, authService.getUserId()));
     }
 
-    @PostMapping
-    public ResponseEntity<Rental> createRental(UUID movieId) throws InvalidEntityException, InvalidIdException {
+    @PostMapping("/{movieId}")
+    public ResponseEntity<Rental> createRental(@PathVariable UUID movieId) throws InvalidEntityException, InvalidIdException {
 
         Rental toAdd = new Rental();
         toAdd.setMovie(movieService.getMovieById(movieId));

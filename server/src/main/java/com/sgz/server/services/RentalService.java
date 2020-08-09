@@ -32,9 +32,7 @@ public class RentalService {
         return allRentals;
     }
 
-    public List<Rental> getAllRentalsByUserId(UUID userId, UUID authId) throws NoItemsException, AccessDeniedException {
-        checkIsAuthorized(userId, authId);
-
+    public List<Rental> getAllRentalsByUserId(UUID userId) throws NoItemsException {
         List<Rental> allRentals = rentalRepo.findAllByUser_Id(userId);
 
         if(allRentals.isEmpty()) throw new NoItemsException("No Items");
